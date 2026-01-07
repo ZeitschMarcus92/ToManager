@@ -1,121 +1,121 @@
-Task 1: Analysis & Project Setup
+# Task 1: Analysis & Project Setup
 
-.NET 9 was downloaded via the internet and executed via CMD.
+                    .NET 9 was downloaded via the internet and executed via CMD.
 
-Navigated to /Desktop/WorkshopToDoManager/WorkshopToDoManager/ToDoManager and ran dotnet run.
+                    Navigated to /Desktop/WorkshopToDoManager/WorkshopToDoManager/ToDoManager and ran dotnet run.
 
-The application started successfully.
+                    The application started successfully.
 
-Accessible and fully functional via the web UI at http://localhost:5172.
+                    Accessible and fully functional via the web UI at http://localhost:5172.
 
-Task 2: Version Control (Git)
+# Task 2: Version Control (Git)
 
-A public GitHub repository was created.
+                    A public GitHub repository was created.
 
-Commands used:
-git init
-git add .
-git commit -m "Initialize repository and add .gitignore"
+                    Commands used:
+                    git init
+                    git add .
+                    git commit -m "Initialize repository and add .gitignore"
 
-Repository was verified on GitHub and the branch set to main:
-git branch -M main
-git remote add origin https://github.com/ZeitschMarcus92/WorkshopToDoManager.git
-git push -u origin main
+                    Repository was verified on GitHub and the branch set to main:
+                    git branch -M main
+                    git remote add origin https://github.com/ZeitschMarcus92/WorkshopToDoManager.git
+                    git push -u origin main
 
-Optionally, the branch can be renamed to master.
+                    Optionally, the branch can be renamed to master.
 
-.gitignore was added and customized.
+                    .gitignore was added and customized.
 
-Task 3: Dockerization
+# Task 3: Dockerization
 
-The application was containerized using a multi-stage Dockerfile.
+                    The application was containerized using a multi-stage Dockerfile.
 
-Build runs in a .NET SDK image, execution in a lightweight runtime image.
+                    Build runs in a .NET SDK image, execution in a lightweight runtime image.
 
-A .dockerignore file was created to exclude unnecessary files:
-bin/, obj/, .git/.
+                    A .dockerignore file was created to exclude unnecessary files:
+                    bin/, obj/, .git/.
 
-Tested in Visual Studio using:
-docker build -t todomanager:test .
-docker run -p 8080:8080 todomanager:test
+                    Tested in Visual Studio using:
+                    docker build -t todomanager:test .
+                    docker run -p 8080:8080 todomanager:test
 
-Since port 8080 was already in use, port 8081 was used successfully.
+                    Since port 8080 was already in use, port 8081 was used successfully.
 
-Task 4: Orchestration with Docker Compose
+# Task 4: Orchestration with Docker Compose
 
-A docker-compose.yml was created with two services:
+                    A docker-compose.yml was created with two services:
 
-.NET web application
+                    .NET web application
 
-PostgreSQL database
+                    PostgreSQL database
 
-Database data is persisted via a Docker volume.
+                    Database data is persisted via a Docker volume.
 
-Connection string is provided via the environment variable ConnectionStrings__ToDoDatabase.
+                    Connection string is provided via the environment variable ConnectionStrings__ToDoDatabase.
 
-A PostgreSQL health check ensures the app starts only after the DB is ready.
+                    A PostgreSQL health check ensures the app starts only after the DB is ready.
 
-Tested successfully with:
-docker compose up --build.
+                    Tested successfully with:
+                    docker compose up --build.
 
-Task 5: GitHub Actions / CI (Continuous Integration)
+# Task 5: GitHub Actions / CI (Continuous Integration)
 
-A GitHub workflow was created at .github/workflows/ci.yml.
+                    A GitHub workflow was created at .github/workflows/ci.yml.
 
-Pipeline triggers on:
+                    Pipeline triggers on:
 
-Push to main
+                    Push to main
 
-Pull requests
+                    Pull requests
 
-Manual trigger (workflow_dispatch)
+                    Manual trigger (workflow_dispatch)
 
-Steps:
+                    Steps:
 
-Checkout source code
+                    Checkout source code
 
-dotnet build
+                    dotnet build
 
-dotnet test
+                    dotnet test
 
-Build Docker image
+                    Build Docker image
 
-Upload Docker image as workflow artifact
+                    Upload Docker image as workflow artifact
 
-Result: every code change is automatically validated with reproducible builds and tests.
+                    Result: every code change is automatically validated with reproducible builds and tests.
 
-Task 6: Bash Scripting – Emergency Backup Plan
+# Task 6: Bash Scripting – Emergency Backup Plan
 
-A Bash script was created for manual execution.
+                    A Bash script was created for manual execution.
 
-Functionality:
+                    Functionality:
 
-Checks if the PostgreSQL container is running
+                    Checks if the PostgreSQL container is running
 
-Creates a database dump using docker exec and pg_dump
+                    Creates a database dump using docker exec and pg_dump
 
-Stores backups in ./backups on the host
+                    Stores backups in ./backups on the host
 
-Filename includes a timestamp (backup_YYYY-MM-DD_HHMM.sql)
+                    Filename includes a timestamp (backup_YYYY-MM-DD_HHMM.sql)
 
-Bonus: keeps only the 5 most recent backups (log rotation)
+                    Bonus: keeps only the 5 most recent backups (log rotation)
 
-Result: fast and secure manual DB backups without local PostgreSQL installation.
+                    Result: fast and secure manual DB backups without local PostgreSQL installation.
 
-Task 7: Infrastructure as Code (Terraform)
+# Task 7: Infrastructure as Code (Terraform)
 
-Azure infrastructure was defined using Terraform.
+                    Azure infrastructure was defined using Terraform.
 
-Resources created:
+                    Resources created:
 
-Resource Group
+                    Resource Group
 
-App Service Plan
+                    App Service Plan
 
-Linux Web App running a Docker container
+                    Linux Web App running a Docker container
 
-nginx:latest is used as a placeholder image.
+                    nginx:latest is used as a placeholder image.
 
-Internal container port 5172 is configured via WEBSITES_PORT.
+                    Internal container port 5172 is configured via WEBSITES_PORT.
 
-Configuration was successfully validated using terraform init and terraform validate.
+                    Configuration was successfully validated using terraform init and terraform validate.
