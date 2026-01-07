@@ -1,0 +1,263 @@
+﻿@page "/"
+@inject ITodoService Todos
+@inject IJSRuntime Js
+
+<div class="d-flex justify-content-end mb-4 gap-2">
+    <button class="btn btn-success" title="Create ToDo" aria-label="Create ToDo" @onclick="OpenModal">✚ Add</button>
+    <button class="btn btn-danger" title="Clear all data" aria-label="Clear all data" @onclick="ConfirmClearAll">🗑️ Clear All</button>
+</div>
+
+@if (items.Count == 0)
+{
+    <div class="alert alert-info">No entries yet. Click the Add button to create one.</div>
+}
+
+@foreach (var group in items
+    .GroupBy(i => i.DueDate.Date)
+    .OrderBy(g => g.Key))
+{
+    <div class="mb-3">
+        <h5 class="mb-2">Due: @group.Key.ToString("yyyy-MM-dd")</h5>
+        <div class="table-responsive mb-2">
+            <table class="table table-hover table-bordered align-middle">
+                <colgroup>
+                    <col style="width:56px" />
+                    <col style="width:30%" />
+                    <col style="width:50%" />
+                    <col style="width:120px" />
+                </colgroup>
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var it in group.Where(i => !i.IsDone).OrderBy(i => i.Title))
+                {
+                    <tr @key="it.Id">
+                        <td class="text-center">
+                            <input type="checkbox" class="form-check-input" checked="@it.IsDone" @onchange="() => Toggle(it.Id)" />
+                        </td>
+                        <td class="text-break">@it.Title</td>
+                        <td class="text-break">@it.Description</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-secondary me-1" title="Edit" aria-label="Edit" @onclick="() => OpenEdit(it)">✏️</button>
+                            <button class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete" @onclick="() => ConfirmRemove(it.Id)">🗑️</button>
+                        </td>
+                    </tr>
+                }
+                @foreach (var it in group.Where(i => i.IsDone).OrderBy(i => i.Title))
+                {
+                    <tr class="table-secondary" @key="it.Id">
+                        <td class="text-center">
+                            <input type="checkbox" class="form-check-input" checked="@it.IsDone" @onchange="() => Toggle(it.Id)" />
+                        </td>
+                        <td class="text-break text-decoration-line-through">@it.Title</td>
+                        <td class="text-break text-decoration-line-through">@it.Description</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-secondary me-1" title="Edit" aria-label="Edit" @onclick="() => OpenEdit(it)">✏️</button>
+                            <button class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete" @onclick="() => ConfirmRemove(it.Id)">🗑️</button>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@if (showAdd)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);" role="dialog">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create ToDo</h5>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="CloseModal"></button>
+                </div>
+                <EditForm EditContext="editContext" OnValidSubmit="CreateTodo">
+                    <DataAnnotationsValidator />
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <InputText id="add-title" class="form-control" @bind-Value="newItem.Title" @onkeydown="OnTitleKeyDown" />
+                            <ValidationMessage For="() => newItem.Title" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description (optional)</label>
+                            <InputTextArea class="form-control" @bind-Value="newItem.Description" rows="2" />
+                        </div>
+                        <div class="mb-1">
+                            <label class="form-label">Due date</label>
+                            <InputDate class="form-control" @bind-Value="newItem.DueDate" />
+                            <ValidationMessage For="() => newItem.DueDate" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CloseModal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showEdit)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);" role="dialog">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit ToDo</h5>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="CloseEdit"></button>
+                </div>
+                <EditForm Model="editItem" OnValidSubmit="SaveEdit">
+                    <DataAnnotationsValidator />
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <InputText class="form-control" @bind-Value="editItem!.Title" />
+                            <ValidationMessage For="() => editItem!.Title" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description (optional)</label>
+                            <InputTextArea class="form-control" @bind-Value="editItem!.Description" rows="2" />
+                        </div>
+                        <div class="mb-1">
+                            <label class="form-label">Due date</label>
+                            <InputDate class="form-control" @bind-Value="editItem!.DueDate" />
+                            <ValidationMessage For="() => editItem!.DueDate" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CloseEdit">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<TodoItem> items = [];
+    private bool showAdd;
+    private bool showEdit;
+    private TodoItem newItem = new() { DueDate = DateTime.Today };
+    private TodoItem? editItem;
+    private EditContext editContext = null!;
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(newItem);
+        Load();
+    }
+
+    private void Load()
+    {
+        items = Todos.GetAll().ToList();
+        StateHasChanged();
+    }
+
+    private async Task OpenModal()
+    {
+        newItem = new TodoItem { DueDate = DateTime.Today };
+        editContext = new EditContext(newItem);
+        showAdd = true;
+        await InvokeAsync(StateHasChanged);
+        try
+        {
+            await Js.InvokeVoidAsync("focusById", "add-title");
+        }
+        catch { }
+    }
+
+    private void CloseModal()
+    {
+        showAdd = false;
+    }
+
+    private async Task CreateTodo()
+    {
+        Todos.Add(new TodoItem
+        {
+            Title = newItem.Title,
+            Description = newItem.Description,
+            DueDate = newItem.DueDate
+        });
+        showAdd = false;
+        Load();
+        await Task.CompletedTask;
+    }
+
+    private async Task OnTitleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            if (editContext.Validate())
+            {
+                await CreateTodo();
+            }
+        }
+    }
+
+    private void Toggle(Guid id)
+    {
+        Todos.ToggleDone(id);
+        Load();
+    }
+
+    private async Task ConfirmRemove(Guid id)
+    {
+        var ok = await Js.InvokeAsync<bool>("confirm", "Delete this item?");
+        if (ok)
+        {
+            Todos.Remove(id);
+            Load();
+        }
+    }
+
+    private async Task ConfirmClearAll()
+    {
+        var ok = await Js.InvokeAsync<bool>("confirm", "Delete ALL items? This cannot be undone.");
+        if (ok)
+        {
+            Todos.ClearAll();
+            Load();
+        }
+        await Task.CompletedTask;
+    }
+
+    private void OpenEdit(TodoItem item)
+    {
+        // Create a copy to edit without mutating list until saved
+        editItem = new TodoItem
+        {
+            Id = item.Id,
+            Title = item.Title,
+            Description = item.Description,
+            DueDate = item.DueDate,
+            IsDone = item.IsDone
+        };
+        showEdit = true;
+    }
+
+    private void CloseEdit()
+    {
+        showEdit = false;
+        editItem = null;
+    }
+
+    private void SaveEdit()
+    {
+        if (editItem is null) return;
+        Todos.Update(editItem);
+        showEdit = false;
+        editItem = null;
+        Load();
+    }
+}

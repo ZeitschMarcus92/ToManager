@@ -1,0 +1,14 @@
+**/bin/
+**/obj/
+*.user
+*.suo
+.vs/
+
+
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/crash.log
+terraform/crash.*.log
+terraform/.terraform.lock.hcl
+backups/

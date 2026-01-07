@@ -1,0 +1,21 @@
+<Project>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <AnalysisLevel>latest-Recommended</AnalysisLevel>
+        <NeutralLanguage>en</NeutralLanguage>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+    <PropertyGroup>
+        <Version>1.0.1</Version>
+        <Company>IT-Titans GmbH</Company>
+        <Copyright>2025 IT-Titans GmbH</Copyright>
+    </PropertyGroup>
+    <PropertyGroup>
+        <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+        <AnalysisLevel>latest</AnalysisLevel>
+    </PropertyGroup>
+</Project>

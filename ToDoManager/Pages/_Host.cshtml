@@ -1,0 +1,41 @@
+﻿@page "/"
+@namespace ITTitans.ToDoManager.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using ITTitans.ToDoManager.Services
+@inject IStorageInfo Storage
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ToDo Manager (@Storage.StorageLabel)</title>
+    <base href="~/" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+</head>
+<body>
+    <app>
+        <component type="typeof(App)" render-mode="ServerPrerendered" />
+    </app>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="_framework/blazor.server.js"></script>
+    <script>
+        window.focusById = function (id) {
+            try {
+                // Defer to the end of the event loop so the element is rendered and visible
+                setTimeout(function() {
+                    var el = document.getElementById(id);
+                    if (el && typeof el.focus === 'function') {
+                        try { el.focus({ preventScroll: true }); } catch { el.focus(); }
+                        if (typeof el.select === 'function') { try { el.select(); } catch { }
+                        }
+                    }
+                }, 0);
+            } catch { }
+        };
+    </script>
+</body>
+</html>

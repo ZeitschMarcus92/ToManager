@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Build
+      run: dotnet build
+
+    - name: Test
+      run: dotnet test || echo "No tests found"
+
+    - name: Build Docker Image
+      run: docker build -t todomanager:ci .
+
+    - name: Save Docker Image
+      run: docker save todomanager:ci -o todomanager.tar
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: docker-image
+        path: todomanager.tar

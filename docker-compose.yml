@@ -1,0 +1,24 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: Marcus
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: test
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U Marcus -d test"]
+
+  app:
+    build: .
+    ports:
+      - "5172:5172"
+    environment:
+      ConnectionStrings__ToDoDatabase: Host=db;Database=test;Username=Marcus;Password=test
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

@@ -1,0 +1,38 @@
+﻿@inherits LayoutComponentBase
+@using System.Reflection
+@using ITTitans.ToDoManager.Services
+@inject IStorageInfo Storage
+
+<nav class="navbar navbar-dark bg-primary">
+    <div class="container">
+        <span class="navbar-brand mb-0 h1">ToDo Manager (@Storage.StorageLabel)</span>
+    </div>
+</nav>
+
+<div class="container py-4">
+    @Body
+</div>
+
+<footer class="border-top py-3 mt-auto">
+    <div class="container text-muted small">
+        <span>Version @VersionText</span>
+    </div>
+</footer>
+
+@code {
+    private string VersionText => GetVersionText();
+
+    private static string GetVersionText()
+    {
+        var assembly = typeof(Program).Assembly;
+        var informational = assembly.GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+        if (!string.IsNullOrWhiteSpace(informational))
+            return informational!;
+
+        var fileVersion = assembly.GetCustomAttribute<System.Reflection.AssemblyFileVersionAttribute>()?.Version;
+        if (!string.IsNullOrWhiteSpace(fileVersion))
+            return fileVersion!;
+
+        return assembly.GetName().Version?.ToString() ?? "unknown";
+    }
+}
